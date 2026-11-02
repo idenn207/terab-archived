@@ -45,7 +45,7 @@ const sampleDrive = {
   id: 'drive-1',
   kind: 'PRIVATE' as const,
   name: '내 드라이브',
-  mountPath: '/volume1/drives/drive-1',
+  mountPath: '/srv/drives/drive-1',
   createdAt: '2026-05-30T00:00:00.000Z',
 };
 
@@ -73,7 +73,7 @@ describe('DriveMountPanel', () => {
         protocol: 'iscsi',
         iqn: 'iqn.2026-05.com.terab:drive-1',
         osUsername: 'terab-cred-1',
-        portalHost: '192.168.0.5',
+        portalHost: '192.0.2.10',
         portalPort: 3260,
         createdAt: '2026-05-30T00:00:00.000Z',
       },
@@ -84,7 +84,7 @@ describe('DriveMountPanel', () => {
     await waitFor(() => expect(screen.getByTestId('revoke-btn-cred-1')).toBeInTheDocument());
     expect(screen.getByText('terab-cred-1')).toBeInTheDocument();
     expect(screen.getByText('iqn.2026-05.com.terab:drive-1')).toBeInTheDocument();
-    expect(screen.getByText('192.168.0.5:3260')).toBeInTheDocument();
+    expect(screen.getByText('192.0.2.10:3260')).toBeInTheDocument();
   });
 
   it('자격증명 3건 — 모든 row 가 회수 버튼을 가진다', async () => {
@@ -94,7 +94,7 @@ describe('DriveMountPanel', () => {
       protocol: 'iscsi',
       iqn: `iqn.2026-05.com.terab:drive-${n}`,
       osUsername: `terab-cred-${n}`,
-      portalHost: '192.168.0.5',
+      portalHost: '192.0.2.10',
       portalPort: 3260,
       createdAt: '2026-05-30T00:00:00.000Z',
     }));
@@ -133,7 +133,7 @@ describe('DriveMountPanel', () => {
         protocol: 'iscsi',
         iqn: 'iqn.2026-05.com.terab:drive-1',
         osUsername: 'terab-cred-1',
-        portalHost: '192.168.0.5',
+        portalHost: '192.0.2.10',
         portalPort: 3260,
         createdAt: '2026-05-30T00:00:00.000Z',
       },

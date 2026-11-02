@@ -446,15 +446,15 @@
 
   ```bash
   # NAS에서 확인
-  DB_DATA_PATH=/volume1/docker/terab/db
-  MINIO_DATA_PATH=/volume1/docker/terab/storage
-  NGINX_CONF_PATH=/volume1/docker/terab/nginx.conf
+  DB_DATA_PATH=<nas-docker-dir>/terab/db
+  MINIO_DATA_PATH=<nas-docker-dir>/terab/storage
+  NGINX_CONF_PATH=<nas-docker-dir>/terab/nginx.conf
   ```
 
   경로가 없으면 생성:
 
   ```bash
-  mkdir -p /volume1/docker/terab/db /volume1/docker/terab/storage
+  mkdir -p <nas-docker-dir>/terab/db <nas-docker-dir>/terab/storage
   ```
 
 - [x] **Step 3: Commit**
@@ -607,7 +607,7 @@
 - [x] **Step 5: 기존 Compose 스택 종료**
 
   ```bash
-  cd /volume1/docker/terab  # 또는 docker-compose.yml이 있는 경로
+  cd <nas-docker-dir>/terab  # 또는 docker-compose.yml이 있는 경로
   docker compose down
   ```
 

@@ -2092,7 +2092,7 @@ redis:
   image: redis:7-alpine
   command: redis-server --appendonly yes
   volumes:
-    - /volume2/docker/terab/volumes/redis:/data
+    - <nas-docker-dir>/terab/volumes/redis:/data
   networks:
     - terab-net
   healthcheck:

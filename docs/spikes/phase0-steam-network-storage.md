@@ -25,7 +25,7 @@ related-plan: ../../.claude/plans/network-storage-reframing-phase0-spike.plan.md
 > 측정 시각 + 동시 IO (RAID rebuild / 백업) 유무를 함께 기록.
 >
 > **환경**: Synology DSM 7.x — `apt` / 외부 패키지 설치 비권장. 측정 도구는 **Container Manager (Synology 공식 패키지)** 로 일회성 Docker 컨테이너 실행. 측정 끝나면 컨테이너 + 이미지 제거.
-> 방화벽: LAN(`192.168.0.0/24`) 안의 Windows 클라이언트는 `all/all 192.168.0.0/24 allow` 룰로 별도 포트 추가 없이 iperf3(5201)/iSCSI(3260)/SMB(445) 통과.
+> 방화벽: LAN(`<lan-subnet>`) 안의 Windows 클라이언트는 `all/all <lan-subnet> allow` 룰로 별도 포트 추가 없이 iperf3(5201)/iSCSI(3260)/SMB(445) 통과.
 
 ### NIC throughput (iperf3 via Docker)
 
@@ -50,14 +50,14 @@ iperf3 -c <nas-lan-ip> -t 30 -P 4 -R
 
 ### 로컬 디스크 (NAS 호스트, fio via Docker)
 
-`docs/spikes/scripts/fio-baseline.sh` 를 fio 컨테이너 안에서 실행. RAID5 위 경로(예: `/volume1/spike-baseline`)를 host volume 으로 마운트.
+`docs/spikes/scripts/fio-baseline.sh` 를 fio 컨테이너 안에서 실행. RAID5 위 경로(예: `<nas-volume>/spike-baseline`)를 host volume 으로 마운트.
 
 명령 (DSM SSH, admin/root):
 
 ```bash
-sudo mkdir -p /volume1/spike-baseline
+sudo mkdir -p <nas-volume>/spike-baseline
 sudo docker run --rm \
-  -v /volume1/spike-baseline:/data \
+  -v <nas-volume>/spike-baseline:/data \
   -v "$PWD/docs/spikes/scripts/fio-baseline.sh:/fio-baseline.sh:ro" \
   --entrypoint bash \
   ljishen/fio /fio-baseline.sh /data
@@ -169,9 +169,9 @@ Run status group 0 (all jobs):
 | random 4K read           | `1653 IOPS` | 기대 ≥ 500                          |
 | seq read warm (2nd pass) | `545 MB/s`  | 1st pass 대비 delta = L2 cache 효과 |
 
-### 로컬 디스크 — T4 (volume4 SSD, production tier)
+### 로컬 디스크 — T4 (SSD 볼륨, production tier)
 
-> **위 측정(T1)은 volume1 HDD 의 floor reference**. spike Go/No-Go 판정의 진짜 근거는 **production tier = volume4 SSD (RAID1, 게임 전용 ~1.8TB)** 에서의 측정값. volume3 Docker 와 동일 SSD pool 이므로 측정 정확도 확보를 위해 **측정 전 Docker 컨테이너 일시 정지** 필수.
+> **위 측정(T1)은 HDD 볼륨 의 floor reference**. spike Go/No-Go 판정의 진짜 근거는 **production tier = SSD 볼륨 (RAID1, 게임 전용 ~1.8TB)** 에서의 측정값. Docker 볼륨 과 동일 SSD pool 이므로 측정 정확도 확보를 위해 **측정 전 Docker 컨테이너 일시 정지** 필수.
 > `ljishen/fio` 이미지에는 `bash` 가 없어 스크립트 bind-mount 가 불가 — fio 인자를 `docker run` 인자로 직접 전달.
 
 명령 (DSM SSH, admin/root):
@@ -180,27 +180,27 @@ Run status group 0 (all jobs):
 # 측정 전: 같은 SSD pool 위 Docker IO 격리
 sudo docker ps -q | xargs -r sudo docker stop
 
-sudo mkdir -p /volume4/spike-baseline
+sudo mkdir -p <nas-volume>/spike-baseline
 
 # [1/3] seq read 1M
-sudo docker run --rm -v /volume4/spike-baseline:/data ljishen/fio \
+sudo docker run --rm -v <nas-volume>/spike-baseline:/data ljishen/fio \
   --name=seq-read --filename=/data/test.bin \
   --rw=read --bs=1M --size=4G --iodepth=32 --runtime=30 \
   --ioengine=libaio --direct=1 --group_reporting
 
 # [2/3] random 4K read — SSD 의 진짜 강점 측정
-sudo docker run --rm -v /volume4/spike-baseline:/data ljishen/fio \
+sudo docker run --rm -v <nas-volume>/spike-baseline:/data ljishen/fio \
   --name=rand-read --filename=/data/test.bin \
   --rw=randread --bs=4k --size=4G --iodepth=64 --runtime=30 \
   --ioengine=libaio --direct=1 --group_reporting
 
 # [3/3] seq read warm
-sudo docker run --rm -v /volume4/spike-baseline:/data ljishen/fio \
+sudo docker run --rm -v <nas-volume>/spike-baseline:/data ljishen/fio \
   --name=seq-read-warm --filename=/data/test.bin \
   --rw=read --bs=1M --size=4G --iodepth=32 --runtime=30 \
   --ioengine=libaio --direct=0 --group_reporting
 
-sudo rm -f /volume4/spike-baseline/test.bin
+sudo rm -f <nas-volume>/spike-baseline/test.bin
 
 # 측정 종료 후 Docker 재개
 sudo docker ps -aq --filter status=exited | xargs -r sudo docker start
@@ -304,7 +304,7 @@ Run status group 0 (all jobs):
    READ: bw=674MiB/s (707MB/s), 674MiB/s-674MiB/s (707MB/s-707MB/s), io=4096MiB (4295MB), run=6077-6077msec
 ```
 
-**T4 결과 (volume4 SSD production tier)** — Decision Gate 의 진짜 근거:
+**T4 결과 (SSD 볼륨 production tier)** — Decision Gate 의 진짜 근거:
 
 | 워크로드       | 측정값       | 비고                                                            |
 | -------------- | ------------ | --------------------------------------------------------------- |
@@ -326,10 +326,10 @@ Run status group 0 (all jobs):
 ### Setup 로그 (DSM SAN Manager)
 
 ```
-SAN Manager LUN: spike0 / Location: volume4 / Capacity: 50 GB / Thick / TRIM enabled
-SAN Manager Target: spike0 / IQN: iqn.2000-01.com.synology:skypark207-nas.Target-1.9938790ef5c
+SAN Manager LUN: spike0 / Location: SSD 볼륨 / Capacity: 50 GB / Thick / TRIM enabled
+SAN Manager Target: spike0 / IQN: iqn.2000-01.com.synology:<nas-hostname>.Target-1.<target-id>
 Mapping: Target spike0 ↔ LUN spike0
-Allowed Initiator: iqn.1991-05.com.microsoft:desktop-skypark207 (RW)
+Allowed Initiator: iqn.1991-05.com.microsoft:<client-hostname> (RW)
 CHAP: disabled (LAN trust, spike)
 Windows Connect: Favorite Targets ✓ + multi-path ✓
 Disk Mgmt: Disk N → GPT → NTFS 64K → Z: (label "spike0")
@@ -337,8 +337,8 @@ Disk Mgmt: Disk N → GPT → NTFS 64K → Z: (label "spike0")
 
 체크:
 
-- [x] LUN 목록에 spike0 (Location: volume4)
-- [x] Target IQN: `iqn.2000-01.com.synology:skypark207-nas.Target-1.9938790ef5c`
+- [x] LUN 목록에 spike0 (Location: SSD 볼륨)
+- [x] Target IQN: `iqn.2000-01.com.synology:<nas-hostname>.Target-1.<target-id>`
 - [x] Allowed initiators 에 Windows IQN 등록
 - [x] 영속화: DSM SAN Manager 가 GUI 변경 자동 저장 (N/A — `saveconfig` 불필요)
 
@@ -359,7 +359,7 @@ Disk Mgmt: Disk N → GPT → NTFS 64K → Z: (label "spike0")
 Raw output:
 
 ```
-=== host: DESKTOP-SKYPARK — 2026-05-26T21:00:14.1056267+09:00 ===
+=== host: <client-hostname> — 2026-05-26T21:00:14.1056267+09:00 ===
 === drive: Z: — size=4G runtime=30s ===
 
 --- [1/3] sequential read (bs=1M, iodepth=32) ---
@@ -472,8 +472,8 @@ Run status group 0 (all jobs):
 
 ## Track B — SMB (SKIP - 운영 트랙 iSCSI 확정)
 
-> **운영 트랙 = iSCSI (volume4)** 로 확정 — SMB 측정/게임 테스트 모두 생략.
-> TBD-1 (SMB vs iSCSI 우선) 답: **iSCSI** — 근거: block-level mount 가 가설 본질 + Steam Anti-Cheat 호환성 ↑ + production tier (volume4) 와 정합.
+> **운영 트랙 = iSCSI (SSD 볼륨)** 로 확정 — SMB 측정/게임 테스트 모두 생략.
+> TBD-1 (SMB vs iSCSI 우선) 답: **iSCSI** — 근거: block-level mount 가 가설 본질 + Steam Anti-Cheat 호환성 ↑ + production tier (SSD 볼륨) 와 정합.
 > 미래에 SMB 대안 평가 필요 시 본 섹션 재활성화.
 
 ### Setup 로그 (NAS, root)
@@ -529,7 +529,7 @@ net use Z: /delete
 ## Steam Workload
 
 게임: `Ghostrunner — single-player`
-트랙: **iSCSI (Z: 드라이브, volume4 LUN)** — 확정, SMB 게임 테스트 없음
+트랙: **iSCSI (Z: 드라이브, SSD 볼륨 LUN)** — 확정, SMB 게임 테스트 없음
 설치 경로: `Z:\SteamLibrary\steamapps\common\Ghostrunner`
 
 ### 첫 실행
@@ -579,7 +579,7 @@ sudo journalctl -k --since "1 hour ago" | grep -iE "iscsi|samba|target|tcm" >> d
 
 **dmesg 분석 결과 (2026-05-27)**:
 
-- iSCSI LUN load: `fileio` 백엔드, volume4 위 `/volume4/@iSCSI/LUN/BLUN_THICK/<UUID>/spike0_00000`
+- iSCSI LUN load: `fileio` 백엔드, SSD 볼륨 위 `<nas-volume>/@iSCSI/LUN/BLUN_THICK/<UUID>/spike0_00000`
 - Login/Logout 사이클: Discovery 1회 + Normal Connect 1회, 비정상 disconnect 0건
 - 에러/경고: 0건
 - 결론: iSCSI 세션 안정성 검증 완료 — Decision Gate "끊김 ≤ 1회/주" 기준 사실상 0건으로 충족
@@ -608,7 +608,7 @@ sudo journalctl -k --since "1 hour ago" | grep -iE "iscsi|samba|target|tcm" >> d
 
 ### PRD TBD 응답
 
-- **TBD-1 (SMB vs iSCSI 우선)**: **iSCSI** — 근거: Track A 만 진행, iSCSI block-level 마운트가 게임 워크로드(NTFS direct mount, Anti-Cheat 호환) + production tier(volume4 SSD) 와 정합. SMB(Track B) 는 비교 측정 생략하고 미래 평가로 보류.
+- **TBD-1 (SMB vs iSCSI 우선)**: **iSCSI** — 근거: Track A 만 진행, iSCSI block-level 마운트가 게임 워크로드(NTFS direct mount, Anti-Cheat 호환) + production tier(SSD 볼륨) 와 정합. SMB(Track B) 는 비교 측정 생략하고 미래 평가로 보류.
 - **TBD-5 (병목 위치)**: **NIC bound (1 GbE 공유기)** — 근거: 디스크 91.8 MB/s = NIC 천장(111 MB/s)의 83%, T4 SSD raw 가 74.7k IOPS 까지 견디므로 디스크 측 여유 충분. 네트워크 천장이 단일 변수.
 
 ### 후속 액션
@@ -617,10 +617,10 @@ sudo journalctl -k --since "1 hour ago" | grep -iE "iscsi|samba|target|tcm" >> d
 - [ ] Go 판정 시: Phase 1 (Storage SoT ADR) + Phase 2 (sidecar) 병렬 착수
 - [ ] No-Go 판정 시: PRD frontmatter status → `superseded` + 새 PRD draft 트리거
 - [x] spike 자원 정리:
-  - DSM **SAN Manager → Target → spike0 → Delete** (실제 IQN: `iqn.2000-01.com.synology:skypark207-nas.Target-1.9938790ef5c`)
+  - DSM **SAN Manager → Target → spike0 → Delete** (실제 IQN: `iqn.2000-01.com.synology:<nas-hostname>.Target-1.<target-id>`)
   - DSM **SAN Manager → LUN → spike0 → Delete**
   - Windows: iSCSI Initiator → Favorite Targets 에서 spike0 제거, diskmgmt.msc 에서 Z: 볼륨 제거
-  - NAS SSH: `sudo rm -rf /volume4/spike-baseline`
+  - NAS SSH: `sudo rm -rf <nas-volume>/spike-baseline`
   - `sudo docker image rm ljishen/fio networkstatic/iperf3`
   - (Track B 진행 시) Control Panel → Shared Folder `spike0-smb` 삭제, User `spike` 삭제
 - [ ] 30일 백그라운드 검증 시작 — 끊김/크래시 누적 시 phase 1+ 일시중단 + retrospect

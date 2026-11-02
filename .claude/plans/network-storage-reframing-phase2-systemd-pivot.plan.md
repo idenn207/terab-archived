@@ -169,11 +169,11 @@ so that **8 세션 .spk 시도의 잔존 blocker(DSM first-start abnormal) 와 C
 
 ### Task 6 — 실 NAS round-trip 검증 (manual)
 
-- **ACTION**: 본인 NAS (`nas-claude`) 에서 install → healthz → 재부팅 → 자동 기동 → uninstall round-trip
+- **ACTION**: 본인 NAS (`<nas-ssh-host>`) 에서 install → healthz → 재부팅 → 자동 기동 → uninstall round-trip
 - **VALIDATE**:
-  - `NAS_HOST=nas-claude make install-agent` exit 0 + healthz `{"status":"ok"}`
-  - NAS 재부팅 후 `ssh nas-claude 'systemctl is-active terab-agent'` = `active`
-  - `NAS_HOST=nas-claude make uninstall-agent` 후 잔존 0
+  - `NAS_HOST=<nas-ssh-host> make install-agent` exit 0 + healthz `{"status":"ok"}`
+  - NAS 재부팅 후 `ssh <nas-ssh-host> 'systemctl is-active terab-agent'` = `active`
+  - `NAS_HOST=<nas-ssh-host> make uninstall-agent` 후 잔존 0
   - 본 plan frontmatter `status` → `done` + ADR-0005 status `proposed` → `accepted` (PR 머지 시)
 
 ---
@@ -189,7 +189,7 @@ EXPECT: 모두 exit 0.
 
 ### systemd unit syntax (NAS 위)
 ```bash
-ssh nas-claude 'sudo systemd-analyze verify /etc/systemd/system/terab-agent.service'
+ssh <nas-ssh-host> 'sudo systemd-analyze verify /etc/systemd/system/terab-agent.service'
 ```
 EXPECT: 출력 0줄 (실패 시 stderr 에 syntax error).
 
@@ -203,12 +203,12 @@ EXPECT: 타입 오류 0, 단위 테스트 통과.
 
 ### round-trip (실 NAS)
 ```bash
-NAS_HOST=nas-claude make install-agent
-ssh nas-claude 'sudo curl -sS --unix-socket /run/terab-agent/agent.sock http://localhost/healthz'
-ssh nas-claude 'sudo reboot' ; sleep 60
-ssh nas-claude 'systemctl is-active terab-agent'
-NAS_HOST=nas-claude make uninstall-agent
-ssh nas-claude 'systemctl status terab-agent 2>&1 | head -3'
+NAS_HOST=<nas-ssh-host> make install-agent
+ssh <nas-ssh-host> 'sudo curl -sS --unix-socket /run/terab-agent/agent.sock http://localhost/healthz'
+ssh <nas-ssh-host> 'sudo reboot' ; sleep 60
+ssh <nas-ssh-host> 'systemctl is-active terab-agent'
+NAS_HOST=<nas-ssh-host> make uninstall-agent
+ssh <nas-ssh-host> 'systemctl status terab-agent 2>&1 | head -3'
 ```
 EXPECT: install ok, healthz `{"status":"ok"}`, 재부팅 후 active, uninstall 후 not-found.
 

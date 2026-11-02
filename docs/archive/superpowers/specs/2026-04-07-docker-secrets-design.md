@@ -64,7 +64,7 @@ environment:
 secrets:
   - terab_db_password
 volumes:
-  - /volume2/docker/terab/volumes/db:/var/lib/postgresql/data  # 하드코딩
+  - <nas-docker-dir>/terab/volumes/db:/var/lib/postgresql/data  # 하드코딩
 ```
 
 **minio 서비스:**
@@ -75,7 +75,7 @@ environment:
 secrets:
   - terab_minio_password
 volumes:
-  - /volume1/storage:/data  # 하드코딩
+  - <nas-storage-dir>:/data  # 하드코딩
 ```
 
 **api 서비스:**

@@ -32,7 +32,7 @@ describe('DriveService', () => {
     service = module.get(DriveService);
     jest.clearAllMocks();
     setupMockDbTransactionChain();
-    mockConfig.getOrThrow.mockReturnValue('/volume1/drives');
+    mockConfig.getOrThrow.mockReturnValue('/srv/drives');
   });
 
   describe('ensurePersonalDrive', () => {
@@ -59,7 +59,7 @@ describe('DriveService', () => {
       expect(insertArgs.ownerId).toBe('user-1');
       expect(insertArgs.kind).toBe('PRIVATE');
       expect(insertArgs.name).toBe('내 드라이브');
-      expect(insertArgs.mountPath).toBe(`/volume1/drives/${insertArgs.id}`);
+      expect(insertArgs.mountPath).toBe(`/srv/drives/${insertArgs.id}`);
     });
   });
 

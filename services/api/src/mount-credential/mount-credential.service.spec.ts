@@ -20,7 +20,7 @@ const driveSample = {
   ownerId: 'user-1',
   name: '내 드라이브',
   kind: 'PRIVATE',
-  mountPath: '/volume1/drives/drive-1',
+  mountPath: '/srv/drives/drive-1',
 };
 
 const rowSample = {
@@ -63,7 +63,7 @@ describe('MountCredentialService', () => {
   };
   const config = {
     getOrThrow: jest.fn((key: string) => {
-      if (key === 'STORAGE_AGENT_PORTAL_HOST') return '192.168.0.5';
+      if (key === 'STORAGE_AGENT_PORTAL_HOST') return '192.0.2.10';
       if (key === 'STORAGE_AGENT_PORTAL_PORT') return '3260';
       throw new Error(`unexpected key ${key}`);
     }),
@@ -129,7 +129,7 @@ describe('MountCredentialService', () => {
       );
       expect(result.password).toMatch(/^[A-Za-z0-9_-]+$/);
       expect(result.script).toContain('New-IscsiTargetPortal');
-      expect(result.portalHost).toBe('192.168.0.5');
+      expect(result.portalHost).toBe('192.0.2.10');
       expect(result.portalPort).toBe(3260);
     });
 
@@ -258,7 +258,7 @@ describe('MountCredentialService', () => {
       repo.findActiveByUserId.mockResolvedValue([rowSample]);
       const result = await service.listActive('user-1');
       expect(result).toHaveLength(1);
-      expect(result[0].portalHost).toBe('192.168.0.5');
+      expect(result[0].portalHost).toBe('192.0.2.10');
       expect(result[0].portalPort).toBe(3260);
       expect(result[0]).not.toHaveProperty('password');
       expect(result[0]).not.toHaveProperty('script');

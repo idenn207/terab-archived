@@ -35,7 +35,7 @@ services:
     env_file:
       - infra.prod.env
     volumes:
-      - /volume1/storage:/data
+      - ${TERAB_STORAGE_DIR:-./volumes/storage}:/data
     ports:
       - '9001:9001'
     networks:
@@ -246,7 +246,7 @@ services:
       - source: nginx_config
         target: /etc/nginx/nginx.conf
     volumes:
-      - /volume3/docker/terab/services/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ${TERAB_APP_DIR:-.}/services/nginx/conf.d:/etc/nginx/conf.d:ro
     networks:
       - terab-net
     healthcheck:
@@ -287,7 +287,7 @@ services:
       AGENT_CLUSTER_ADDR: tasks.portainer_agent
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /volume3/@docker/volumes:/var/lib/docker/volumes
+      - ${DOCKER_VOLUMES_DIR:-/var/lib/docker/volumes}:/var/lib/docker/volumes
     networks:
       - terab-net
     deploy:

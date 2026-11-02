@@ -20,7 +20,7 @@ const FAKEDSM_BIN_CANDIDATES = ['fakedsm-linux-amd64', 'fakedsm-linux-arm64', 'f
 
 const PORTAL_HOST = '127.0.0.1';
 const PORTAL_PORT = '3260';
-const DRIVE_ROOT = '/volume1/drives';
+const DRIVE_ROOT = '/srv/drives';
 
 function locateBinary(candidates: string[]): string | null {
   const binDir = path.join(WORKTREE_ROOT, 'services', 'storage-agent', 'bin');

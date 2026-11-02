@@ -167,7 +167,7 @@ N/A — 본 phase 는 사용자 대상 UI 변경이 없는 **내부 설계 활�
   - `ownerId` uuid NOT NULL → `users.id` ON DELETE CASCADE
   - `name` varchar(100) NOT NULL — drive display name (예: "내 드라이브", "가족 공용")
   - `kind` varchar(16) NOT NULL — `'PRIVATE' | 'SHARED'` (string literal union, service 레이어 `@IsIn` 검증). v1 에선 2종, v1.x 에서 확장 여지
-  - `mountPath` varchar(255) NOT NULL UNIQUE — NAS filesystem 실제 경로 (예: `/volume1/drives/{drive_id}`). UNIQUE 로 중복 mount 방지
+  - `mountPath` varchar(255) NOT NULL UNIQUE — NAS filesystem 실제 경로 (예: `<nas-drives-dir>/{drive_id}`). UNIQUE 로 중복 mount 방지
   - `quotaBytes` bigint NULL — Could in PRD(v1.1). null = 무제한
   - `createdAt`, `updatedAt` timestamp withTimezone notNull defaultNow
 - **인덱스**: `index().on(ownerId)`, `index().on(kind)`. `mountPath` 는 unique 가 이미 index 역할
