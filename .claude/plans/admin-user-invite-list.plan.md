@@ -91,7 +91,7 @@ curl -I https://drive.skypark207.com/                                      # 200
 | `InvitationService.create` 의 `APP_BASE_URL` 이 NAS prod 환경에서 `https://drive.skypark207.com` 으로 설정 안 되면 invite URL 오류 | Task 11 사전 점검에 `api.prod.env` 확인 명시 |
 | services/web `/register/<token>` 가 backup code / 2FA 등록을 처리하지 못해 새 사용자 admin 진입 차단 | PRD risk 동일. 본 plan scope 외 — 별도 PRD 분기 후속 |
 | `npm run openapi:codegen` 이 dev API 미가동 시 실패 (`http://localhost:3000/json` fetch 실패) | Task 7 사전 단계로 `make api` 또는 `make infra && cd services/api && npm run start:dev` 가동 명시 |
-| NAS DSM 라우팅 / TLS 인증서 / prod env 첫 세팅 시 시간 소요 | M1 plan Task 8 시나리오 재사용 — DSM Application Portal 에 admin.drive.skypark207.com 추가 + `/volume3/docker/terab/admin.prod.env` 생성 |
+| NAS DSM 라우팅 / TLS 인증서 / prod env 첫 세팅 시 시간 소요 | M1 plan Task 8 시나리오 재사용 — DSM Application Portal 에 admin.drive.skypark207.com 추가 + `<nas-docker-dir>/terab/admin.prod.env` 생성 |
 
 ## Acceptance
 
@@ -147,7 +147,7 @@ dev API 가동 시도 → `STORAGE_AGENT_SOCKET_PATH` env 키 누락(v0.1 base �
 
 ### 사용자 인계 사항
 
-1. **NAS 배포 (Task 11)**: DSM Application Portal 에 admin.drive.skypark207.com 추가 + `/volume3/docker/terab/admin.prod.env` 생성 + master merge + `make stack-update`
+1. **NAS 배포 (Task 11)**: DSM Application Portal 에 admin.drive.skypark207.com 추가 + `<nas-docker-dir>/terab/admin.prod.env` 생성 + master merge + `make stack-update`
 2. **codegen 평소화**: NAS 가동 후 (또는 v0.1 base 의 `STORAGE_AGENT_SOCKET_PATH` 결함 해결 후) `cd services/admin && npm run openapi:codegen` 1회 실행 — 산출물이 본 plan 의 수동 갱신과 정합 (PR 머지 후 노이즈 0건이 정상)
 3. **e2e 4단계 (Task 12)**: admin 로그인 → /admin/users 진입 → invite 발급 → URL 복사 → services/web `/register/<token>` 가입 → admin 목록 새로고침
 4. **ADR-0006 status accepted 갱신**: PR 머지 후 별도 commit (ADR-0005 패턴 — PR 번호 + 머지일 채움)

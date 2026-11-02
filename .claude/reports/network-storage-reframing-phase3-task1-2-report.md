@@ -154,8 +154,8 @@
   - `DRIVE_NOT_FOUND` → 404, `DRIVE_FORBIDDEN` → 403
   - `MOUNT_CREDENTIAL_NOT_FOUND` → 404, `MOUNT_CREDENTIAL_DUPLICATE_PROTOCOL` → 409 (Phase 1 unique 제약 위반 시), `MOUNT_CREDENTIAL_REVOKED` → 410 GONE, `MOUNT_CREDENTIAL_SECRET_WRITE_FAILED` → 500
 - **env 값 (api.env.example)**:
-  - `STORAGE_AGENT_PORTAL_HOST=192.168.0.5`, `STORAGE_AGENT_PORTAL_PORT=3260`
-  - `STORAGE_DRIVE_ROOT=/volume1/drives`
+  - `STORAGE_AGENT_PORTAL_HOST=<nas-lan-ip>`, `STORAGE_AGENT_PORTAL_PORT=3260`
+  - `STORAGE_DRIVE_ROOT=<nas-drives-dir>`
   - `STORAGE_SECRET_DIR=/run/secrets` (dev 는 `os.tmpdir()/terab-secrets` fallback)
 - **Drive 의 도메인 결정**:
   - `kind = 'PRIVATE'` literal — personal drive 의 판정 키

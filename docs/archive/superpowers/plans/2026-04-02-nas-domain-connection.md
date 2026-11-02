@@ -4,7 +4,7 @@
 
 **Goal:** DSM Application Portal을 진입점으로 사용해 `drive.skypark207.com`을 NAS의 terab 컨테이너와 연결한다.
 
-**Architecture:** iptime 포트포워딩(80/443 → 192.168.0.10)은 유지하고, DSM 내장 nginx가 서브도메인별로 내부 컨테이너 포트로 프록시한다. terab-nginx 컨테이너를 호스트 8080 포트로 노출해 DSM이 접근할 수 있게 한다.
+**Architecture:** iptime 포트포워딩(80/443 → <nas-lan-ip>)은 유지하고, DSM 내장 nginx가 서브도메인별로 내부 컨테이너 포트로 프록시한다. terab-nginx 컨테이너를 호스트 8080 포트로 노출해 DSM이 접근할 수 있게 한다.
 
 **Tech Stack:** Docker Compose, DSM 7.x Application Portal, Let's Encrypt (HTTP-01), Synology DDNS, Whois DNS
 
@@ -92,7 +92,7 @@ docker ps | grep terab-nginx
 NAS 내부에서 응답 확인:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}" http://192.168.0.10:8080/
+curl -s -o /dev/null -w "%{http_code}" http://<nas-lan-ip>:8080/
 # 200 또는 301 이면 정상
 ```
 
@@ -109,8 +109,8 @@ git commit -m "feat: terab-nginx 호스트 포트 8080 바인딩 추가"
 
 **전제 조건 확인:**
 
-- iptime 포트포워딩: 80 → 192.168.0.10:80 (이미 설정됨)
-- Whois DNS: `drive.skypark207.com` CNAME → `skypark207.synology.me` (이미 설정됨)
+- iptime 포트포워딩: 80 → <nas-lan-ip>:80 (이미 설정됨)
+- Whois DNS: `drive.skypark207.com` CNAME → `<nas-ddns-host>` (이미 설정됨)
 - DSM DDNS가 현재 공인 IP를 가리키고 있을 것
 
 - [x] **Step 1: DSM 제어판 → 보안 → 인증서 접속**
@@ -143,11 +143,11 @@ DSM 메뉴 → 제어판 → 보안 → 인증서 탭
 
 **실패 시 체크리스트:**
 
-1. iptime에서 외부 80 포트 → 192.168.0.10:80 포트포워딩 활성화 여부 확인
+1. iptime에서 외부 80 포트 → <nas-lan-ip>:80 포트포워딩 활성화 여부 확인
 2. `drive.skypark207.com`이 실제로 현재 공인 IP를 가리키는지 확인:
    ```bash
    nslookup drive.skypark207.com
-   # skypark207.synology.me를 거쳐 공인 IP가 나와야 함
+   # <nas-ddns-host>를 거쳐 공인 IP가 나와야 함
    ```
 3. DSM 방화벽에서 외부 80 포트 허용 여부 확인 (제어판 → 보안 → 방화벽)
 
@@ -264,7 +264,7 @@ git status
 
 새 서비스(예: `media.skypark207.com`) 추가 시:
 
-1. **Whois**: `media.skypark207.com` CNAME → `skypark207.synology.me` 추가
+1. **Whois**: `media.skypark207.com` CNAME → `<nas-ddns-host>` 추가
 2. **docker-compose**: 해당 서비스 nginx에 `ports: - "8081:80"` 추가 (포트 번호 증가)
 3. **DSM 인증서**: `media.skypark207.com` Let's Encrypt 개별 발급
 4. **DSM Application Portal**: `media.skypark207.com:443 → localhost:8081` 규칙 추가

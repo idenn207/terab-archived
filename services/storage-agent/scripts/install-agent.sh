@@ -3,9 +3,9 @@
 # 결정 배경: docs/adr/0005-sidecar-agent-systemd-only.md
 #
 # Usage:
-#   NAS_HOST=nas-claude [NAS_USER=admin] bash scripts/install-agent.sh
+#   NAS_HOST=<nas-ssh-host> [NAS_USER=admin] bash scripts/install-agent.sh
 # 또는:
-#   NAS_HOST=nas-claude make install-agent
+#   NAS_HOST=<nas-ssh-host> make install-agent
 #
 # 사전 조건:
 #   1) make build-linux-amd64  (services/storage-agent/bin/agent-linux-amd64 생성)
@@ -30,7 +30,7 @@ log() { printf '[install-agent] %s\n' "$*"; }
 fail() { printf '[install-agent] ERROR: %s\n' "$*" >&2; exit 1; }
 
 # step 1: env / 산출물 사전 검증
-[[ -n "${NAS_HOST}" ]] || fail "NAS_HOST 미설정 — 예: NAS_HOST=nas-claude $0"
+[[ -n "${NAS_HOST}" ]] || fail "NAS_HOST 미설정 — 예: NAS_HOST=<nas-ssh-host> $0"
 [[ -f "${AGENT_BIN}" ]] || fail "agent binary 없음 (${AGENT_BIN}) — 'make build-linux-amd64' 먼저 실행"
 [[ -f "${UNIT_FILE}" ]] || fail "systemd unit 파일 없음 (${UNIT_FILE})"
 

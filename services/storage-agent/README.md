@@ -106,7 +106,7 @@ NAS 의 `${NAS_USER}` 계정에 **sudo NOPASSWD** 설정 필요 (install script 
 prompt 에서 hang 되지 않도록):
 
 ```bash
-ssh nas-claude  # 또는 자신의 NAS host
+ssh <nas-ssh-host>  # 또는 자신의 NAS host
 sudo visudo
 # 다음 줄 추가 후 저장:
 #   admin ALL=(ALL) NOPASSWD: ALL
@@ -120,8 +120,8 @@ sudo visudo
 
 ```bash
 cd services/storage-agent
-NAS_HOST=nas-claude make install-agent
-# 또는: NAS_HOST=nas-claude bash scripts/install-agent.sh
+NAS_HOST=<nas-ssh-host> make install-agent
+# 또는: NAS_HOST=<nas-ssh-host> bash scripts/install-agent.sh
 ```
 
 스크립트가 자동 수행:
@@ -140,8 +140,8 @@ NAS_HOST=nas-claude make install-agent
 `WantedBy=multi-user.target` 으로 NAS 재부팅 시 자동 기동:
 
 ```bash
-ssh nas-claude 'sudo reboot' ; sleep 60
-ssh nas-claude 'systemctl is-active terab-agent'
+ssh <nas-ssh-host> 'sudo reboot' ; sleep 60
+ssh <nas-ssh-host> 'systemctl is-active terab-agent'
 # → active
 ```
 
@@ -149,7 +149,7 @@ ssh nas-claude 'systemctl is-active terab-agent'
 
 ```bash
 cd services/storage-agent
-NAS_HOST=nas-claude make uninstall-agent
+NAS_HOST=<nas-ssh-host> make uninstall-agent
 ```
 
 dummy target 회수 시도(`iqn.*com.terab:*` 잔존 삭제) + `systemctl disable --now` +

@@ -28,7 +28,7 @@ const issuedPayload = {
   password: 'abc-XYZ_pwd-123',
   script: '# powershell mount script',
   osUsername: 'terab-cred-1',
-  portalHost: '192.168.0.5',
+  portalHost: '192.0.2.10',
   portalPort: 3260,
   createdAt: '2026-05-30T00:00:00.000Z',
 };

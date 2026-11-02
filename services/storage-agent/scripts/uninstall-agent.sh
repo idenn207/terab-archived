@@ -3,9 +3,9 @@
 # 결정 배경: docs/adr/0005-sidecar-agent-systemd-only.md
 #
 # Usage:
-#   NAS_HOST=nas-claude [NAS_USER=admin] bash scripts/uninstall-agent.sh
+#   NAS_HOST=<nas-ssh-host> [NAS_USER=admin] bash scripts/uninstall-agent.sh
 # 또는:
-#   NAS_HOST=nas-claude make uninstall-agent
+#   NAS_HOST=<nas-ssh-host> make uninstall-agent
 
 set -euo pipefail
 

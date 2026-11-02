@@ -19,8 +19,8 @@ proposed — PR #?? (머지 시점에 `accepted` + PR 번호 + 머지일로 갱�
 
 [Phase 0 spike](../spikes/phase0-steam-network-storage.md) 가 답을 좁혔다. Spike 의 결과 요약:
 
-- **Track A — iSCSI**: DSM 7.x SAN Manager 로 volume4 SSD 위 LUN/Target 발급 → Windows iSCSI Initiator 로 마운트 → Steam Ghostrunner 설치·30분 인게임. Decision Gate 5/5 Pass, Anti-Cheat 차단 0회, 크래시 0회. 실측 디스크 read 91.8 MB/s (1 GbE NIC 천장 111 MB/s 의 83%) + 563 IOPS
-- **Track B — SMB**: **SKIP** — iSCSI 가 가설(직접 마운트 + Steam) 의 본질에 더 가깝고 production tier (volume4 SSD) 와 정합되어 운영 트랙으로 확정, SMB 비교 측정 자체를 생략
+- **Track A — iSCSI**: DSM 7.x SAN Manager 로 SSD 볼륨 위 LUN/Target 발급 → Windows iSCSI Initiator 로 마운트 → Steam Ghostrunner 설치·30분 인게임. Decision Gate 5/5 Pass, Anti-Cheat 차단 0회, 크래시 0회. 실측 디스크 read 91.8 MB/s (1 GbE NIC 천장 111 MB/s 의 83%) + 563 IOPS
+- **Track B — SMB**: **SKIP** — iSCSI 가 가설(직접 마운트 + Steam) 의 본질에 더 가깝고 production tier (SSD 볼륨) 와 정합되어 운영 트랙으로 확정, SMB 비교 측정 자체를 생략
 
 이 상태에서 v1 출시 결정은 셋 중 하나:
 

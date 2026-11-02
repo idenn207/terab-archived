@@ -576,7 +576,7 @@ api:
     secrets:
       - RABBITMQ_PASSWORD
     volumes:
-      - /volume2/docker/terab/volumes/rabbitmq:/var/lib/rabbitmq
+      - <nas-docker-dir>/terab/volumes/rabbitmq:/var/lib/rabbitmq
     networks:
       - terab-net
     healthcheck:

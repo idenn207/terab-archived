@@ -16,10 +16,10 @@ Synology NAS(DSM 7.x)에 배포된 Docker 컨테이너를 커스텀 도메인(sk
 | 항목 | 값 |
 |------|-----|
 | NAS OS | DSM 7.x |
-| NAS 내부 IP | 192.168.0.10 |
+| NAS 내부 IP | <nas-lan-ip> |
 | 공유기 | iptime A2004SE |
 | DDNS 공급자 | Synology |
-| DDNS 도메인 | skypark207.synology.me |
+| DDNS 도메인 | <nas-ddns-host> |
 | DNS 공급자 | Whois |
 | 커스텀 도메인 | skypark207.com |
 
@@ -30,13 +30,13 @@ Synology NAS(DSM 7.x)에 배포된 Docker 컨테이너를 커스텀 도메인(sk
 ```
 클라이언트
   ↓ drive.skypark207.com (HTTPS:443)
-Whois DNS — CNAME → skypark207.synology.me
+Whois DNS — CNAME → <nas-ddns-host>
   ↓
 Synology DDNS — 공인 IP 자동 추적
   ↓ 80 / 443
-iptime A2004SE — 포트포워딩 → 192.168.0.10
+iptime A2004SE — 포트포워딩 → <nas-lan-ip>
   ↓
-DSM nginx (192.168.0.10:80/443) — Application Portal 역방향 프록시
+DSM nginx (<nas-lan-ip>:80/443) — Application Portal 역방향 프록시
   ├─ drive.skypark207.com → localhost:8080 (terab-nginx 컨테이너)
   └─ media.skypark207.com → localhost:8081 (nas-media 컨테이너, 향후)
           ↓
@@ -51,9 +51,9 @@ DSM nginx (192.168.0.10:80/443) — Application Portal 역방향 프록시
 
 ### 1. DNS / DDNS 레이어
 
-- **Whois**: `drive.skypark207.com` CNAME → `skypark207.synology.me`
+- **Whois**: `drive.skypark207.com` CNAME → `<nas-ddns-host>`
 - **Synology DDNS**: DSM 내장 DDNS 클라이언트가 공인 IP 변경 시 자동 업데이트
-- **iptime**: 포트포워딩 80/443 → 192.168.0.10 (이미 설정됨, 변경 불필요)
+- **iptime**: 포트포워딩 80/443 → <nas-lan-ip> (이미 설정됨, 변경 불필요)
 
 새 서브도메인 추가 시 Whois에서 동일 패턴의 CNAME 레코드를 추가한다.
 
@@ -64,7 +64,7 @@ DSM nginx (192.168.0.10:80/443) — Application Portal 역방향 프록시
 - **갱신**: DSM이 만료 30일 전 자동 갱신
 - **적용**: Application Portal 역방향 프록시 규칙에 인증서 자동 연결
 
-HTTP-01 검증 경로(`/.well-known/acme-challenge/`)는 포트 80이 외부에서 NAS까지 연결되어 있어야 하므로 iptime 포트포워딩(80 → 192.168.0.10)이 필수 전제 조건이다.
+HTTP-01 검증 경로(`/.well-known/acme-challenge/`)는 포트 80이 외부에서 NAS까지 연결되어 있어야 하므로 iptime 포트포워딩(80 → <nas-lan-ip>)이 필수 전제 조건이다.
 
 ### 3. DSM Application Portal (역방향 프록시)
 
@@ -120,7 +120,7 @@ nginx:
 외부에서 NAS 내부망에 직접 접근할 경우 VPN을 사용한다.
 
 - **도구**: Synology VPN Server 패키지 (WireGuard 또는 OpenVPN) 또는 Tailscale
-- **구조**: VPN 접속 후 `192.168.0.10`으로 DSM 및 컨테이너에 직접 접근 (포트포워딩 불필요)
+- **구조**: VPN 접속 후 `<nas-lan-ip>`으로 DSM 및 컨테이너에 직접 접근 (포트포워딩 불필요)
 - **보안 효과**: 공개 인터넷 노출 최소화, 민감 서비스는 VPN 전용으로 제한 가능
 
 VPN 구성은 본 설계 범위 밖이며 별도 스펙으로 다룬다.

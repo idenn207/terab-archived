@@ -65,7 +65,7 @@ storage-agent 의 NAS 배포를 **systemd-only** 로 전환한다. 적용 디테
    - `RuntimeDirectory=terab-agent` (= `/run/terab-agent/` 자동 생성)
    - `[Install] WantedBy=multi-user.target` (.spk 의 `pkgctl-*.service` WantedBy 와 달리 표준 target)
 
-4. **operator onboarding**: `NAS_HOST=nas-claude make install-agent` — install-agent.sh 를 wrap. 단일 명령 idempotent.
+4. **operator onboarding**: `NAS_HOST=<nas-ssh-host> make install-agent` — install-agent.sh 를 wrap. 단일 명령 idempotent.
 
 5. **.spk 산출물 처리**: `services/storage-agent/spk/` 디렉토리 + Makefile 의 `.spk` 타겟 모두 **그대로 보존**. 본 ADR 은 그것을 *현재 빌드/배포 path 에서 제외* 할 뿐 산출물을 삭제하지 않는다 — 미래 패키지화 결정 번복 시 시작점. `services/storage-agent/README.md` 의 첫 줄에 보존 의의 명시.
 

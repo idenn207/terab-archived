@@ -220,7 +220,7 @@ services/web 의 부트스트랩 구조(2-stage Node→nginx Dockerfile, Vite, F
 
 - **Action**:
   1. PR merge 전 NAS 측 준비: DSM Application Portal 에 `admin.drive.skypark207.com` → terab nginx 컨테이너 (port 8080) 라우팅 추가. 인증서는 기존 wildcard `*.drive.skypark207.com` 가 있다면 자동 적용, 없으면 Let's Encrypt 발급
-  2. NAS `/volume3/docker/terab/admin.prod.env` 생성 (빈 파일 또는 placeholder)
+  2. NAS `<nas-docker-dir>/terab/admin.prod.env` 생성 (빈 파일 또는 placeholder)
   3. v0.1 → master merge → CI deploy job 자동 실행
   4. NAS smoke test
 - **Validate**:

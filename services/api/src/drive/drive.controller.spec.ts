@@ -12,7 +12,7 @@ const sampleDrive = {
   ownerId: 'user-1',
   name: '내 드라이브',
   kind: 'PRIVATE',
-  mountPath: '/volume1/drives/drive-1',
+  mountPath: '/srv/drives/drive-1',
   quotaBytes: null,
   createdAt: new Date('2026-01-01T00:00:00Z'),
   updatedAt: new Date('2026-01-01T00:00:00Z'),

@@ -70,14 +70,15 @@ dev-update:
 # ─── Docker Swarm 운영 환경 ────────────────────────────────────────
 .PHONY: ensure-volumes
 ensure-volumes: ## 운영 스택 bind mount 경로 생성 (없을 경우에만)
-	@mkdir -p \
-		/volume3/docker/terab/volumes/db \
-		/volume3/docker/terab/volumes/redis \
-		/volume3/docker/terab/services/nginx \
-		/volume1/storage
-	@chown -R 999:999 \
-		/volume3/docker/terab/volumes/db \
-		/volume3/docker/terab/volumes/redis
+	@. ./nas.env; \
+	mkdir -p \
+		"$$TERAB_APP_DIR/volumes/db" \
+		"$$TERAB_APP_DIR/volumes/redis" \
+		"$$TERAB_APP_DIR/services/nginx" \
+		"$$TERAB_STORAGE_DIR" && \
+	chown -R 999:999 \
+		"$$TERAB_APP_DIR/volumes/db" \
+		"$$TERAB_APP_DIR/volumes/redis"
 
 .PHONY: stack
 stack:

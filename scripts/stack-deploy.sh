@@ -5,6 +5,9 @@
 
 set -euo pipefail
 
+# 운영 경로는 커밋하지 않는 nas.env에 둔다(nas.env.example 참고).
+set -a; . ./nas.env; set +a
+
 STACK="terab"
 INFRA_SERVICES=("${STACK}_db" "${STACK}_redis" "${STACK}_minio")
 APP_SERVICES=("${STACK}_api" "${STACK}_mq")

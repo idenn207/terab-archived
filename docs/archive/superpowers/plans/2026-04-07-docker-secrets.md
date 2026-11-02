@@ -259,7 +259,7 @@ services:
     secrets:
       - terab_db_password
     volumes:
-      - /volume2/docker/terab/volumes/db:/var/lib/postgresql/data
+      - <nas-docker-dir>/terab/volumes/db:/var/lib/postgresql/data
     networks:
       - terab-net
     healthcheck:
@@ -287,7 +287,7 @@ services:
     secrets:
       - terab_minio_password
     volumes:
-      - /volume1/storage:/data
+      - <nas-storage-dir>:/data
     ports:
       - '9001:9001'
     networks:
@@ -372,7 +372,7 @@ services:
     ports:
       - '8080:80'
     volumes:
-      - /volume2/docker/terab/services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - <nas-docker-dir>/terab/services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - terab-net
     healthcheck:
@@ -468,9 +468,9 @@ git commit -m "feat: docker-stack.yml Docker Secrets 적용 및 경로 하드코
 # 참고: docs/superpowers/specs/2026-04-07-docker-secrets-design.md
 
 # ─── Paths (로컬 개발용) ─────────────────────────────────────────
-DB_DATA_PATH=/volume2/docker/terab/volumes/db
-MINIO_DATA_PATH=/volume1/storage
-NGINX_CONF_PATH=/volume2/docker/terab/services/nginx/nginx.conf
+DB_DATA_PATH=<nas-docker-dir>/terab/volumes/db
+MINIO_DATA_PATH=<nas-storage-dir>
+NGINX_CONF_PATH=<nas-docker-dir>/terab/services/nginx/nginx.conf
 
 # ─── Database ────────────────────────────────────────────────────
 DB_NAME=terab_db

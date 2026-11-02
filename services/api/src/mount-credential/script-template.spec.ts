@@ -1,7 +1,7 @@
 import { renderPowerShellMountScript } from './script-template';
 
 const baseArgs = {
-  portalHost: '192.168.0.5',
+  portalHost: '192.0.2.10',
   portalPort: 3260,
   iqn: 'iqn.2026-05.com.terab:drive-1',
   chapUsername: 'mount-cred-abc',
@@ -15,7 +15,7 @@ describe('renderPowerShellMountScript', () => {
     const script = renderPowerShellMountScript(baseArgs);
     expect(script).toContain('Set-Service -Name MSiSCSI -StartupType Automatic');
     expect(script).toContain('Start-Service MSiSCSI');
-    expect(script).toContain('New-IscsiTargetPortal -TargetPortalAddress "192.168.0.5"');
+    expect(script).toContain('New-IscsiTargetPortal -TargetPortalAddress "192.0.2.10"');
     expect(script).toContain('Connect-IscsiTarget');
     expect(script).toContain('-AuthenticationType ONEWAYCHAP');
     expect(script).toContain('-ChapUsername "mount-cred-abc"');

@@ -49,8 +49,8 @@ so that **Phase 4 의 30일 게임 플레이 검증 동안 매번 DSM SAN Manage
 
 | # | 결정 항목 | 선택지 | 권장 |
 |---|---|---|---|
-| **D1** | `drives` 의 `mountPath` 결정 시점 | (a) 본 phase 가 결정해 schema row 에 INSERT (예: `/volume1/drives/{driveId}`), (b) 환경변수 `STORAGE_DRIVE_ROOT` + driveId 조합으로 service 가 생성 | **(b)** — 운영/로컬 NAS 경로 차이를 env 로 분리. service 가 INSERT 시점에 `${root}/${driveId}` 로 생성. hardcoded 경로 금지 |
-| **D2** | iSCSI portal IP/port 노출 | (a) API 응답에 plain text 포함, (b) `.ps1` 템플릿에만 inline | **(a) + (b)** — UI 가이드 카드에 *portal 주소를 명시*하고 (`.ps1` 자체 실행 못 할 환경 대비), 동시에 `.ps1` 내부에도 inline. env: `STORAGE_AGENT_PORTAL_HOST` (예: `192.168.0.5:3260`) |
+| **D1** | `drives` 의 `mountPath` 결정 시점 | (a) 본 phase 가 결정해 schema row 에 INSERT (예: `<nas-drives-dir>/{driveId}`), (b) 환경변수 `STORAGE_DRIVE_ROOT` + driveId 조합으로 service 가 생성 | **(b)** — 운영/로컬 NAS 경로 차이를 env 로 분리. service 가 INSERT 시점에 `${root}/${driveId}` 로 생성. hardcoded 경로 금지 |
+| **D2** | iSCSI portal IP/port 노출 | (a) API 응답에 plain text 포함, (b) `.ps1` 템플릿에만 inline | **(a) + (b)** — UI 가이드 카드에 *portal 주소를 명시*하고 (`.ps1` 자체 실행 못 할 환경 대비), 동시에 `.ps1` 내부에도 inline. env: `STORAGE_AGENT_PORTAL_HOST` (예: `<nas-lan-ip>:3260`) |
 | **D3** | `.ps1` 다운로드 endpoint 위치 | (a) `GET /api/mount-credentials/:id/script.ps1` (응답 `text/plain` + `Content-Disposition: attachment`), (b) UI 가 응답 JSON 으로 받은 자격증명을 client 측 string interpolation 으로 조립 | **(a)** — server 가 권위 있는 source of truth. 가이드 템플릿 수정 시 client 재빌드 불필요. `Content-Type: application/x-powershell; charset=utf-8` |
 | **D4** | revoke 시 agent target 삭제 정책 | (a) DB soft-revoke 만 + 별도 cleanup 잡, (b) revoke 시 **즉시** `storageAgentClient.deleteTarget(iqn)` 호출 + 실패 시 `STORAGE_AGENT_*` 전파 | **(b)** — 가설 검증 phase 의 마찰 ↓. agent 실패 시 사용자가 즉시 알아채야 함. 별도 cleanup 잡은 Phase 5 multi-tenant 에서 |
 | **D5** | mountPath 디렉토리 생성 책임 | (a) `storage-agent` 가 책임 (현재 contract 외), (b) API 가 host OS 에 *간접*으로 만들 방법 없음 → **v1.0 은 본인이 사전 생성** + plan README 에 명시 | **(b)** — Phase 3 scope 안에 host filesystem 조작을 추가하지 않음. drives 의 `mountPath` 는 본인이 DSM 에서 사전 생성한 share location 을 가리킨다는 것을 plan/PRD 에 명시. host fs 자동화는 v1.x 의 agent contract 확장과 묶음 |
@@ -196,7 +196,7 @@ so that **Phase 4 의 30일 게임 플레이 검증 동안 매번 DSM SAN Manage
 |---|---|---|---|
 | `services/api/src/common/exceptions/error-code.enum.ts` | UPDATE | (보존) | `DRIVE_NOT_FOUND`, `DRIVE_FORBIDDEN`, `MOUNT_CREDENTIAL_NOT_FOUND`, `MOUNT_CREDENTIAL_DUPLICATE_PROTOCOL` (Phase 1 의 unique 제약 위반 시), `MOUNT_CREDENTIAL_REVOKED`, `MOUNT_CREDENTIAL_SECRET_WRITE_FAILED` 추가 |
 | `services/api/src/app.module.ts` | UPDATE | (보존) | `imports: [..., DriveModule, MountCredentialModule]` |
-| `api.env.example` | UPDATE | (보존) | `STORAGE_DRIVE_ROOT=/volume1/drives` + `STORAGE_AGENT_PORTAL_HOST=192.168.0.5` + `STORAGE_AGENT_PORTAL_PORT=3260` + `STORAGE_SECRET_DIR=/run/secrets` 추가 |
+| `api.env.example` | UPDATE | (보존) | `STORAGE_DRIVE_ROOT=<nas-drives-dir>` + `STORAGE_AGENT_PORTAL_HOST=<nas-lan-ip>` + `STORAGE_AGENT_PORTAL_PORT=3260` + `STORAGE_SECRET_DIR=/run/secrets` 추가 |
 
 ### Web — entity slices (신규)
 
